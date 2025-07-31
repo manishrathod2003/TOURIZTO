@@ -6,7 +6,7 @@ import rajwada from '../images/RajwadaPalace.jpg';
 import sarafa from '../images/sarafa.jpg';
 import patalpani from '../images/PatalpaniWaterfalls.jpg';
 import lalbagh from '../images/Lal-Bagh-Palace.jpg';
-import KM from '../images/kanchMandir.jpg'
+import KM from '../images/KanchMandir.jpg'
 import krishna from '../images/krishnapurachhatri.jpg';
 
 const Home = () => {
