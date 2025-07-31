@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tourizto Email Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      color: #333;
+    }
+    h1 {
+      color: #ff7043;
+      border-bottom: 2px solid #ff7043;
+      padding-bottom: 10px;
+    }
+    .test-container {
+      background-color: #f5f5f5;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #ff7043;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #f4511e;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 4px;
+    }
+    .success {
+      background-color: #e8f5e9;
+      border: 1px solid #a5d6a7;
+    }
+    .error {
+      background-color: #ffebee;
+      border: 1px solid #ef9a9a;
+    }
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+      margin-left: 10px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .preview-container {
+      margin-top: 20px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 15px;
+    }
+    .preview-link {
+      display: block;
+      margin-top: 10px;
+      color: #2196f3;
+      text-decoration: none;
+    }
+    .preview-link:hover {
+      text-decoration: underline;
+    }
+    .test-steps {
+      background-color: #e3f2fd;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+    .test-steps ol {
+      margin-left: 20px;
+      padding-left: 0;
+    }
+    .test-steps li {
+      margin-bottom: 8px;
+    }
+    .screenshot-tip {
+      background-color: #fff9c4;
+      padding: 10px;
+      border-radius: 4px;
+      margin-top: 20px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tourizto Email Test</h1>
+  
+  <div class="test-steps">
+    <h3>Test Steps:</h3>
+    <ol>
+      <li>Enter your email address in the form below</li>
+      <li>Click "Run Email Test" button</li>
+      <li>Wait for the test to complete</li>
+      <li>Take a screenshot of the test results</li>
+      <li>If successful, click the preview link to view the test email</li>
+      <li>Take a screenshot of the email preview</li>
+      <li>Include both screenshots in your report</li>
+    </ol>
+  </div>
+  
+  <div class="test-container">
+    <h2>Email Test Form</h2>
+    <div class="form-group">
+      <label for="email">Email Address:</label>
+      <input type="email" id="email" placeholder="Enter your email address" required>
+    </div>
+    
+    <button id="testButton" onclick="runTest()">Run Email Test</button>
+    <span id="loading" class="loading" style="display: none;"></span>
+    
+    <div id="result" class="result" style="display: none;"></div>
+    
+    <div id="previewContainer" class="preview-container" style="display: none;">
+      <h3>Email Preview</h3>
+      <p>Click the link below to view your test email:</p>
+      <a id="previewLink" class="preview-link" href="#" target="_blank">View Test Email</a>
+    </div>
+    
+    <div class="screenshot-tip">
+      Tip: Take screenshots of both the test results and the email preview for your report.
+    </div>
+  </div>
+  
+  <script>
+    async function runTest() {
+      const email = document.getElementById('email').value;
+      if (!email) {
+        alert('Please enter an email address');
+        return;
+      }
+      
+      // Show loading indicator
+      document.getElementById('loading').style.display = 'inline-block';
+      document.getElementById('testButton').disabled = true;
+      document.getElementById('result').style.display = 'none';
+      document.getElementById('previewContainer').style.display = 'none';
+      
+      try {
+        // Test data
+        const testData = {
+          email: email,
+          name: 'Test User',
+          place: 'Rajwada Palace',
+          date: 'June 15, 2023',
+          time: '10:00 AM',
+          adults: 2,
+          children: 1,
+          totalAmount: 200,
+          bookingReference: `TZ-${Date.now().toString().slice(-6)}`
+        };
+        
+        // Send request to API
+        const response = await fetch('http://localhost:5000/api/email/send-test', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(testData),
+        });
+        
+        const data = await response.json();
+        
+        // Display result
+        const resultElement = document.getElementById('result');
+        
+        if (response.ok && data.success) {
+          resultElement.className = 'result success';
+          resultElement.innerHTML = `
+            <h3>✅ TEST PASSED</h3>
+            <p>Email sent successfully!</p>
+            <p><strong>Message ID:</strong> ${data.messageId}</p>
+          `;
+          
+          // Show preview link if available
+          if (data.previewUrl) {
+            document.getElementById('previewContainer').style.display = 'block';
+            document.getElementById('previewLink').href = data.previewUrl;
+          }
+        } else {
+          resultElement.className = 'result error';
+          resultElement.innerHTML = `
+            <h3>❌ TEST FAILED</h3>
+            <p>${data.message || 'An error occurred'}</p>
+            <p><strong>Error:</strong> ${data.error || 'Unknown error'}</p>
+          `;
+        }
+        
+        resultElement.style.display = 'block';
+      } catch (error) {
+        const resultElement = document.getElementById('result');
+        resultElement.className = 'result error';
+        resultElement.innerHTML = `
+          <h3>❌ TEST FAILED</h3>
+          <p>An error occurred while running the test</p>
+          <p><strong>Error:</strong> ${error.message}</p>
+        `;
+        resultElement.style.display = 'block';
+      } finally {
+        // Hide loading indicator
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('testButton').disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
